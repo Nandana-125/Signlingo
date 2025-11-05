@@ -2,9 +2,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
-  margin-top: 2rem;
   position: relative;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .lessonWrapper {
@@ -14,34 +14,28 @@
   position: relative;
 }
 
-.connector {
+/* Circle overlap fix */
+.lessonWrapper:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 90%;              /* start just under the circle */
+  left: 50%;
+  transform: translateX(-50%);
   width: 6px;
-  height: 60px;
-  border-radius: 4px;
-  margin-top: 0.3rem;
-  transition: all 0.3s ease;
+  height: 100px;         /* adjust for spacing between lessons */
+  background: #9cc5a1;
+  border-radius: 3px;
+  z-index: -1;           /* place line behind bubbles */
 }
 
-.connectorCompleted {
-  background-color: #49a078;
+/* completed line color */
+.lessonWrapper.completed::after {
+  background: #49a078;
+  box-shadow: 0 0 8px rgba(73, 160, 120, 0.4);
 }
 
-.connectorPending {
-  background-color: #9cc5a1;
-  opacity: 0.5;
-}
-
-/* Responsive tweak: horizontal layout on wider screens */
-@media (min-width: 768px) {
-  .pathContainer {
-    flex-direction: row;
-    justify-content: center;
-    gap: 3rem;
-  }
-
-  .connector {
-    height: 6px;
-    width: 80px;
-    margin: 0 1rem;
+@media (min-width: 800px) {
+  .lessonWrapper:not(:last-child)::after {
+    height: 110px;
   }
 }

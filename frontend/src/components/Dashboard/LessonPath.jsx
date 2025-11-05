@@ -11,17 +11,13 @@ const LessonPath = () => {
   return (
     <div className={styles.pathContainer}>
       {lessons.map((lesson, index) => (
-        <div key={lesson.id} className={styles.lessonWrapper}>
+        <div
+          key={lesson.id}
+          className={`${styles.lessonWrapper} ${
+            lesson.status === "completed" ? styles.completed : ""
+          }`}
+        >
           <LessonNode lesson={lesson} />
-          {index < lessons.length - 1 && (
-            <div
-              className={`${styles.connector} ${
-                lesson.status === "completed"
-                  ? styles.connectorCompleted
-                  : styles.connectorPending
-              }`}
-            ></div>
-          )}
         </div>
       ))}
     </div>

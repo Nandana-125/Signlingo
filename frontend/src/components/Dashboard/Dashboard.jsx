@@ -1,7 +1,5 @@
 import styles from "./Dashboard.module.css";
 import LessonNode from "./LessonNode";
-import XPCard from "./XPCard";
-import StreakCard from "./StreakCard";
 import LessonPath from "./LessonPath";
 
 const Dashboard = () => {
@@ -17,10 +15,6 @@ const Dashboard = () => {
         <div>
           <h1>Welcome back, Learner 👋</h1>
           <p>Continue your sign journey!</p>
-        </div>
-        <div className={styles.cards}>
-          <XPCard xp={250} goal={500} />
-          <StreakCard streak={5} />
         </div>
       </header>
 

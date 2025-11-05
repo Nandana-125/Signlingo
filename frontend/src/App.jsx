@@ -1,3 +1,4 @@
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Flashscreen from "./pages/Flashscreen.jsx";
 import AuthPage from "./pages/Auth/AuthPage.jsx";
@@ -7,12 +8,14 @@ import QuizSelectPage from "./pages/Quizzes/QuizSelectPage.jsx";
 import QuizPlayPage from "./pages/Quizzes/QuizPlayPage.jsx";
 import LivePracticePage from "./pages/Live/LivePracticePage.jsx";
 
-/* Minimal placeholder pages so the nav works now */
+import LessonsPage from "./pages/Lessons/LessonsPage.jsx";
+import LessonViewPage from "./pages/Lessons/LessonViewPage.jsx";
+
+/* Minimal placeholder pages for other routes */
 const Stub = (t) => () => (
-  <div style={{ fontSize: 24, fontWeight: 800 }}>{t}</div>
+  <div style={{ fontSize: 24, fontWeight: 800, padding: "2rem" }}>{t}</div>
 );
 
-const LessonsPage = Stub("Lessons");
 const QuizzesPage = Stub("Quizzes");
 const LeaderboardPage = Stub("Leaderboard");
 const LivePage = Stub("Live Practice");
@@ -21,13 +24,15 @@ const CharactersPage = Stub("Characters");
 export default function App() {
   return (
     <Routes>
+      {/* Landing + Auth routes */}
       <Route path="/" element={<Flashscreen />} />
       <Route path="/login" element={<AuthPage />} />
 
+      {/* AppShell with Navbar + Nested Pages */}
       <Route path="/app" element={<AppShell />}>
         <Route index element={<Navigate to="lessons" replace />} />
         <Route path="lessons" element={<LessonsPage />} />
-        {/* quizzes */}
+        <Route path="lesson/:lessonId" element={<LessonViewPage />} />
         <Route path="quizzes" element={<QuizSelectPage />} />
         <Route path="quizzes/:level" element={<QuizPlayPage />} />
         <Route path="leaderboard" element={<LeaderboardPage />} />
@@ -35,6 +40,8 @@ export default function App() {
         <Route path="characters" element={<CharactersPage />} />
         <Route path="profile" element={<ProfilePage />} />
       </Route>
+
+      {/* Fallback route */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

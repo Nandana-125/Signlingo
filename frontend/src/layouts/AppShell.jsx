@@ -1,23 +1,29 @@
+import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import { StatsProvider } from "../context/UserStatsContext.jsx";
+import RightStats from "../components/RightStats/RightStats.jsx";
 import SideNav from "../components/Nav/SideNav.jsx";
-import TopStatusBar from "../components/UI/TopStatusBar.jsx";
-import s from "./AppShell.module.css";
+import styles from "./AppShell.module.css";
 
 export default function AppShell() {
-  const handleLogout = () => {
-    window.location.href = "/login";
-  };
-
-  const location = useLocation();
-  const hideStatus = location.pathname.includes("/app/profile"); // hide on profile page
+  const { pathname } = useLocation();
+  const hideRight = pathname.startsWith("/app/profile");
 
   return (
-    <div className={s.grid}>
-      <SideNav onLogout={handleLogout} />
-      <main className={s.content}>
-        {!hideStatus && <TopStatusBar />} {/* ✅ visible everywhere except profile */}
-        <Outlet />
-      </main>
-    </div>
+    <StatsProvider>
+      <div className={`${styles.shell} ${hideRight ? styles.noRight : ""}`}>
+        <aside className={styles.left}>
+          <SideNav />
+        </aside>
+        <main className={styles.content}>
+          <Outlet />
+        </main>
+        {!hideRight && (
+          <div className={styles.right}>
+            <RightStats />
+          </div>
+        )}
+      </div>
+    </StatsProvider>
   );
 }

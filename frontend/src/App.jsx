@@ -7,7 +7,7 @@ import ProfilePage from "./pages/Profile/ProfilePage.jsx";
 import QuizSelectPage from "./pages/Quizzes/QuizSelectPage.jsx";
 import QuizPlayPage from "./pages/Quizzes/QuizPlayPage.jsx";
 import LivePracticePage from "./pages/Live/LivePracticePage.jsx";
-
+import LeaderboardPage from "./pages/Leaderboard/LeaderboardPage.jsx";
 import LessonsPage from "./pages/Lessons/LessonsPage.jsx";
 import LessonViewPage from "./pages/Lessons/LessonViewPage.jsx";
 
@@ -17,7 +17,6 @@ const Stub = (t) => () => (
 );
 
 const QuizzesPage = Stub("Quizzes");
-const LeaderboardPage = Stub("Leaderboard");
 const LivePage = Stub("Live Practice");
 const CharactersPage = Stub("Characters");
 

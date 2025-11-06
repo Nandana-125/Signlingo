@@ -1,7 +1,8 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import s from "./LoginForm.module.css";
-// import { AuthAPI } from "../../api/auth.api";
+import { AuthAPI } from "../../api/auth.api";
+import { useNavigate } from "react-router-dom";
 
 function EyeIcon({ on, ...props }) {
   return on ? (
@@ -30,14 +31,19 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
+  const navigate = useNavigate();
+
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMsg("");
     try {
       // await AuthAPI.login({ email, password: pw, remember })
-      await new Promise((r) => setTimeout(r, 500)); // demo
-      setMsg("✔ Logged in (demo). Wire to backend later.");
+      // await AuthAPI.login({ email, password: pw });
+      // setMsg("✔ Logged in (demo). Wire to backend later.");
+      const res = await AuthAPI.login({ email, password: pw });
+      setMsg("✔ " + res.message);
+      setTimeout(() => navigate("/app/lessons"), 800); 
     } catch (err) {
       setMsg(err.message || "Login failed");
     } finally {

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import s from "./SignupForm.module.css";
-// import { AuthAPI } from "../../api/auth.api";
+import { AuthAPI } from "../../api/auth.api";
+import { useNavigate } from "react-router-dom";
 
 export default function SignupForm({ onSwitchToLogin }) {
   const [form, setForm] = useState({
@@ -16,14 +17,19 @@ export default function SignupForm({ onSwitchToLogin }) {
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
+  const navigate = useNavigate();
+
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMsg("");
     try {
       // await AuthAPI.signup({ ...form, age: Number(form.age) })
-      await new Promise((r) => setTimeout(r, 600)); // demo
-      setMsg("✔ Account created (demo). You can now login.");
+      // await AuthAPI.signup({ ...form, age: Number(form.age) });
+      // setMsg("✔ Account created (demo). You can now login.");
+      const res = await AuthAPI.signup({ ...form, age: Number(form.age) });
+      setMsg("✔ " + res.message);
+      setTimeout(() => navigate("/app/lessons"), 800);
     } catch (err) {
       setMsg(err.message || "Signup failed");
     } finally {

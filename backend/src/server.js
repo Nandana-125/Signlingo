@@ -4,6 +4,9 @@ import MongoStore from "connect-mongo";
 import dotenv from "dotenv";
 import { connectDB } from "./db/mongoClient.js";
 import authRoutes from "./routes/auth.routes.js";
+import userLessonsRoutes from "./routes/userLessons.routes.js";
+
+import lessonsRoutes from "./routes/lessons.routes.js";
 
 dotenv.config();
 
@@ -41,6 +44,10 @@ app.use(
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => res.send("SignLingo backend running"));
+
+app.use("/api/lessons", lessonsRoutes);
+
+app.use("/api/user-lessons", userLessonsRoutes);
 
 const PORT = process.env.PORT || 5000;
 

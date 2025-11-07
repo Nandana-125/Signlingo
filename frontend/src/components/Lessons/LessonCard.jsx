@@ -12,7 +12,7 @@ export default function LessonCard({ lesson, onClick }) {
     >
       <h3 className={styles.cardTitle}>{lesson.title}</h3>
       <p className={styles.cardMeta}>
-        {lesson.signs} Signs · {lesson.time}
+      {(lesson.signCount || lesson.signs?.length || 0)} Signs · {lesson.estimatedMinutes || lesson.time}
       </p>
       <span className={styles.status}>Start</span>
     </div>

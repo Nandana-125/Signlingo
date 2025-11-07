@@ -1,34 +1,42 @@
-import React, { useState } from "react";
-import LessonCard from "./LessonCard.jsx";
-import LessonDetailsPanel from "./LessonDetailsPanel.jsx";
+import { useState } from "react";
+import LessonCard from "./LessonCard";
+import LessonDetailsPanel from "./LessonDetailsPanel";
+import { useLessons } from "../../hooks/useLessons";
 import styles from "./Lessons.module.css";
 
-const lessons = [
-  { id: 1, title: "Alphabets", color: "#216869", signs: 26, time: "3 min", desc: "Learn hand signs for A–Z letters." },
-  { id: 2, title: "Greetings", color: "#49a078", signs: 15, time: "2 min", desc: "Common greetings and polite expressions." },
-  { id: 3, title: "Numbers", color: "#9cc5a1", signs: 20, time: "4 min", desc: "Count from 0–100 using sign language." },
-  { id: 4, title: "Food & Drinks", color: "#5b8a72", signs: 18, time: "3 min", desc: "Vocabulary for meals and drinks." },
-];
-
 export default function LessonGrid() {
-  const [selected, setSelected] = useState(null);
+  const [selectedLessonId, setSelectedLessonId] = useState(null);
+  const { lessons, lesson, loading, error } = useLessons(selectedLessonId);
+
+  if (loading) return <p>Loading lessons...</p>;
+  if (error) return <p>Error: {error}</p>;
+
+  // toggle a CSS class when the panel is open
+  const layoutClass = selectedLessonId
+    ? `${styles.layout} ${styles.panelOpen}`
+    : styles.layout;
 
   return (
-    <div className={styles.layout}>
-      <div className={styles.grid}>
-        {lessons.map((lesson) => (
-          <LessonCard
-            key={lesson.id}
-            lesson={lesson}
-            onClick={() => setSelected(lesson)}
-          />
-        ))}
+    <div className={layoutClass}>
+      <div className={styles.gridContainer}>
+        <div className={styles.grid}>
+          {lessons.map((l, i) => (
+            <LessonCard
+              key={l._id}
+              lesson={{
+                ...l,
+                color: ["#216869", "#49a078", "#9cc5a1", "#5b8a72"][i % 4],
+              }}
+              onClick={() => setSelectedLessonId(l._id)}
+            />
+          ))}
+        </div>
       </div>
 
-      {selected && (
+      {selectedLessonId && lesson && (
         <LessonDetailsPanel
-          lesson={selected}
-          onClose={() => setSelected(null)}
+          lesson={lesson}
+          onClose={() => setSelectedLessonId(null)}
         />
       )}
     </div>

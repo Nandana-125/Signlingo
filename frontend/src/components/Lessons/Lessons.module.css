@@ -221,3 +221,152 @@
   background: #216869;
   color: #fff;
 }
+
+/* preview of first few signs in the side panel */
+.signPreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.signPreviewItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 70px;
+  color: #1f2421;
+}
+
+.signPreviewItem img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #f5f5f5;
+  padding: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.signPreviewItem span {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.panelBody {
+  padding: 1.5rem 2rem;
+  color: #1f2421;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.startBtn {
+  margin-top: 1.5rem; /* ensures it's always visible below previews */
+}
+
+.layout {
+  position: relative;
+  display: flex;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+/* wrap grid inside a responsive container */
+.gridContainer {
+  flex: 1;
+  transition: margin-right 0.3s ease;
+}
+
+/* when panel open, push grid a bit left */
+.layout.panelOpen .gridContainer {
+  margin-right: 360px; /* same width as .panel */
+}
+
+.panelTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.panelSubtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #dce1de;
+  margin: 1rem 0;
+}
+
+.intro {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.summaryList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+.summaryList li {
+  margin-bottom: 0.4rem;
+}
+
+.panelHeader {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1.5rem 1rem 1.5rem 1.2rem;
+  color: #fff;
+}
+
+.backArrow {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.backArrow:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+}
+
+.panelTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.panelSubtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panelHeader {
+  animation: fadeSlideDown 0.3s ease forwards;
+}

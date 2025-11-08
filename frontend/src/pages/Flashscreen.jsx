@@ -1,15 +1,22 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Flashscreen.module.css";
-//import heroImg from "../assets/images/interpreter.png";
 
-const Flashscreen = () => {
+// If your asset is PNG, just switch to .png here.
+import heroImg from "../assets/images/hero-bg-2.gif";
+
+export default function Flashscreen() {
   const navigate = useNavigate();
 
   return (
     <div className={styles.container}>
+      {/* Top bar */}
       <header className={styles.header}>
-        <h2 className={styles.logo}>SignLingo</h2>
+        <div className={styles.brand} onClick={() => navigate("/")}>
+          <span className={styles.dot} />
+          <span>SignLingo</span>
+        </div>
+
         <nav className={styles.nav}>
           <button
             className={styles.loginBtn}
@@ -20,48 +27,71 @@ const Flashscreen = () => {
         </nav>
       </header>
 
+      {/* Hero split */}
       <section className={styles.hero}>
-        <div className={styles.textBlock}>
-          <h1 className={styles.title}>
-            The best place to <span>learn sign language</span> through fun!
-          </h1>
-          <p className={styles.subtitle}>
-            Learn. Practice. Communicate — all in one interactive platform that
-            makes sign language learning engaging and easy.
-          </p>
-          <button className={styles.ctaBtn} onClick={() => navigate("/login")}>
-            Start Learning
-          </button>
-        </div>
-      </section>
+        {/* Left */}
+        <div className={styles.left}>
+          <p className={styles.kicker}>Welcome to SignLingo</p>
 
-      <section className={styles.features}>
-        <h2 className={styles.featuresTitle}>Exciting Features</h2>
-        <div className={styles.cards}>
-          <div className={styles.card}>
-            <h3>Learn with Lessons</h3>
-            <p>
-              Structured modules — from alphabets to greetings and everyday
-              expressions.
-            </p>
+          <h1 className={styles.title}>
+            THE DIFFERENCE, LOVE
+            <br />
+            <span className={styles.highlight}>THE EXPERIENCE!</span>
+          </h1>
+
+          <p className={styles.subtitle}>
+            Learn sign language in a playful, gamified way. Practice live with
+            your webcam, master letters & gestures, take quizzes, and climb the
+            leaderboard.
+          </p>
+
+          <div className={styles.ctaRow}>
+            <button
+              className={styles.cta}
+              onClick={() => navigate("/learn")}
+              aria-label="Start learning SignLingo"
+            >
+              Start learning
+            </button>
           </div>
-          <div className={styles.card}>
-            <h3>Fun Quizzes</h3>
-            <p>
-              Challenge yourself with multiple-choice and typing practice
-              quizzes!
-            </p>
+          {/* Feature cards (row with shadows) */}
+          <div className={styles.features}>
+            <article className={styles.featureCard}>
+              <div className={styles.featureIcon}>🎥</div>
+              <h4>Live practice</h4>
+              <p>Use your webcam and get instant feedback on your signs.</p>
+            </article>
+
+            <article className={styles.featureCard}>
+              <div className={styles.featureIcon}>🔤</div>
+              <h4>Letters & gestures</h4>
+              <p>Master A–Z, numbers, and everyday gestures step-by-step.</p>
+            </article>
+
+            <article className={styles.featureCard}>
+              <div className={styles.featureIcon}>🧩</div>
+              <h4>Quizzes</h4>
+              <p>Quick checks after each lesson to lock in what you learn.</p>
+            </article>
+
+            <article className={styles.featureCard}>
+              <div className={styles.featureIcon}>🏆</div>
+              <h4>Leaderboard</h4>
+              <p>Keep streaks, earn badges, and challenge your friends.</p>
+            </article>
           </div>
-          <div className={styles.card}>
-            <h3>Live Practice</h3>
-            <p>
-              Try real-time webcam-based recognition to perfect your gestures.
-            </p>
+        </div>
+
+        {/* Right – BIG rectangular image (no circle) */}
+        <div className={styles.right}>
+          <div className={styles.imageCard}>
+            <img
+              src={heroImg}
+              alt="Vibrant hero image matching SignLingo theme"
+            />
           </div>
         </div>
       </section>
     </div>
   );
-};
-
-export default Flashscreen;
+}

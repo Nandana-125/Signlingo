@@ -1,152 +1,183 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "../db/mongoClient.js";
 
-export const startLesson = async (req, res) => {
-  try {
-    const db = getDB();
-    const { userId, lessonId } = req.body;
+/** Resolve logged-in user from the session */
+function requireSessionUser(req, res) {
+  const id = req.session?.userId;
+  if (!id || !ObjectId.isValid(id)) {
+    res.status(401).json({ success: false, message: "Not authenticated" });
+    return null;
+  }
+  return new ObjectId(id);
+}
 
-    const existing = await db.collection("userLessons").findOne({
-      userId: new ObjectId(userId),
-      lessonId: new ObjectId(lessonId),
-    });
+/** Make a legacy-safe filter that matches string OR ObjectId userId */
+function userMatch(oid) {
+  return { $or: [{ userId: oid }, { userId: oid.toString() }] };
+}
 
-    if (existing) return res.json({ success: true, userLesson: existing });
+/** POST /api/user-lessons/start  { lessonId }  */
+export async function startLesson(req, res) {
+  const userId = requireSessionUser(req, res);
+  if (!userId) return;
 
-    const newDoc = {
-      userId: new ObjectId(userId),
-      lessonId: new ObjectId(lessonId),
+  const { lessonId } = req.body || {};
+  if (!lessonId || !ObjectId.isValid(lessonId)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid lessonId" });
+  }
+  const db = getDB();
+  const lid = new ObjectId(lessonId);
+
+  // upsert the record; prefer storing ObjectIds going forward
+  const now = new Date();
+  const { value } = await db.collection("userLessons").findOneAndUpdate(
+    { ...userMatch(userId), lessonId: lid },
+    {
+      $setOnInsert: {
+        userId,
+        lessonId: lid,
+        completedSigns: [],
+        xpEarned: 0,
+        completed: false,
+        createdAt: now,
+      },
+      $set: { updatedAt: now },
+    },
+    { upsert: true, returnDocument: "after" }
+  );
+
+  res.json({ success: true, userLesson: value });
+}
+
+/** GET /api/user-lessons/progress?lessonId=... */
+export async function getProgressForLesson(req, res) {
+  const userId = requireSessionUser(req, res);
+  if (!userId) return;
+
+  const { lessonId } = req.query || {};
+  if (!lessonId || !ObjectId.isValid(lessonId)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid lessonId" });
+  }
+  const db = getDB();
+  const lid = new ObjectId(lessonId);
+
+  const rec = await db.collection("userLessons").findOne({
+    ...userMatch(userId),
+    lessonId: lid,
+  });
+
+  if (!rec) return res.json({ success: true, progress: null });
+
+  res.json({
+    success: true,
+    progress: {
+      completedSigns: (rec.completedSigns || []).map(String),
+      xpEarned: Number(rec.xpEarned || 0),
+      completed: !!rec.completed,
+    },
+  });
+}
+
+/** GET /api/user-lessons  (all for this user) */
+export async function getUserLessons(req, res) {
+  const userId = requireSessionUser(req, res);
+  if (!userId) return;
+
+  const db = getDB();
+  const rows = await db
+    .collection("userLessons")
+    .find(userMatch(userId))
+    .toArray();
+
+  res.json({ success: true, lessons: rows });
+}
+
+/** PUT /api/user-lessons/:lessonId/progress  { signId } */
+export async function updateProgress(req, res) {
+  const userId = requireSessionUser(req, res);
+  if (!userId) return;
+
+  const { lessonId } = req.params;
+  const { signId } = req.body || {};
+
+  if (!ObjectId.isValid(lessonId) || !ObjectId.isValid(signId)) {
+    return res.status(400).json({ success: false, message: "Invalid IDs" });
+  }
+
+  const db = getDB();
+  const lid = new ObjectId(lessonId);
+  const sid = new ObjectId(signId);
+
+  // ensure record exists
+  let rec = await db
+    .collection("userLessons")
+    .findOne({ ...userMatch(userId), lessonId: lid });
+  if (!rec) {
+    await db.collection("userLessons").insertOne({
+      userId,
+      lessonId: lid,
       completedSigns: [],
       xpEarned: 0,
       completed: false,
       createdAt: new Date(),
       updatedAt: new Date(),
-    };
-
-    const result = await db.collection("userLessons").insertOne(newDoc);
-    res.json({ success: true, userLesson: { ...newDoc, _id: result.insertedId } });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-export const getUserLessons = async (req, res) => {
-  try {
-    const db = getDB();
-    const { userId } = req.query;
-
-    const lessons = await db
-      .collection("userLessons")
-      .find({ userId: new ObjectId(userId) })
-      .toArray();
-
-    res.json({ success: true, lessons });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-export const updateProgress = async (req, res) => {
-  try {
-    const db = getDB();
-    const { lessonId } = req.params;
-    const { userId, signId } = req.body;
-
-    if (!ObjectId.isValid(userId) || !ObjectId.isValid(lessonId)) {
-      return res.status(400).json({ success: false, message: "Invalid IDs" });
-    }
-
-    console.log("🟢 updateProgress called with:", { lessonId, userId, signId });
-
-    // check if userLesson exists; create if not
-    let userLesson = await db.collection("userLessons").findOne({
-      userId: new ObjectId(userId),
-      lessonId: new ObjectId(lessonId),
     });
+    rec = await db.collection("userLessons").findOne({ userId, lessonId: lid });
+  }
 
-    if (!userLesson) {
-      userLesson = {
-        userId: new ObjectId(userId),
-        lessonId: new ObjectId(lessonId),
-        completedSigns: [],
-        xpEarned: 0,
-        completed: false,
-        createdAt: new Date(),
+  // total signs in lesson (for completion calc)
+  const lesson = await db
+    .collection("lessons")
+    .findOne({ _id: lid }, { projection: { signIds: 1 } });
+  if (!lesson)
+    return res
+      .status(404)
+      .json({ success: false, message: "Lesson not found" });
+
+  const prev = (rec.completedSigns || []).map((x) => x.toString());
+  const nextSet = new Set(prev);
+  nextSet.add(sid.toString());
+  const nextArr = [...nextSet].map((x) => new ObjectId(x));
+
+  const completed = nextArr.length === (lesson.signIds?.length || 0);
+  const xpEarned = nextArr.length * 5; // 5 XP per sign
+
+  await db.collection("userLessons").updateOne(
+    { _id: rec._id },
+    {
+      $set: {
+        completedSigns: nextArr,
+        completed,
+        xpEarned,
         updatedAt: new Date(),
-      };
-      const { insertedId } = await db.collection("userLessons").insertOne(userLesson);
-      userLesson._id = insertedId;
-    }
-
-    // get lesson to count signs
-    const lesson = await db.collection("lessons").findOne({ _id: new ObjectId(lessonId) });
-    if (!lesson) return res.status(404).json({ success: false, message: "Lesson not found" });
-
-    // update completed signs + XP
-    const updatedSigns = [...new Set([...userLesson.completedSigns.map(String), signId])];
-    const completed = updatedSigns.length === lesson.signIds.length;
-    const xpEarned = updatedSigns.length * 5;
-
-    await db.collection("userLessons").updateOne(
-      { _id: userLesson._id },
-      {
-        $set: {
-          completedSigns: updatedSigns.map((id) => new ObjectId(id)),
-          xpEarned,
-          completed,
-          updatedAt: new Date(),
-        },
-      }
-    );
-
-    res.json({ success: true, completed, xpEarned });
-  } catch (err) {
-    console.error("updateProgress error:", err);
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-
-export const resetLesson = async (req, res) => {
-  try {
-    const db = getDB();
-    const { lessonId } = req.params;
-    const { userId } = req.body;
-
-    await db.collection("userLessons").deleteOne({
-      userId: new ObjectId(userId),
-      lessonId: new ObjectId(lessonId),
-    });
-
-    res.json({ success: true, message: "Progress reset" });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-export const getProgressForLesson = async (req, res) => {
-  try {
-    const db = getDB();
-    const { userId, lessonId } = req.query;
-
-    const record = await db.collection("userLessons").findOne({
-      userId: new ObjectId(userId),
-      lessonId: new ObjectId(lessonId),
-    });
-
-    if (!record) {
-      return res.json({ success: true, progress: null });
-    }
-
-    res.json({
-      success: true,
-      progress: {
-        completedSigns: record.completedSigns,
-        xpEarned: record.xpEarned,
-        completed: record.completed,
       },
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    }
+  );
+
+  res.json({ success: true, completed, xpEarned });
+}
+
+/** DELETE /api/user-lessons/:lessonId/reset */
+export async function resetLesson(req, res) {
+  const userId = requireSessionUser(req, res);
+  if (!userId) return;
+
+  const { lessonId } = req.params;
+  if (!ObjectId.isValid(lessonId)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid lessonId" });
   }
-};
+
+  const db = getDB();
+  const lid = new ObjectId(lessonId);
+
+  await db
+    .collection("userLessons")
+    .deleteOne({ ...userMatch(userId), lessonId: lid });
+  res.json({ success: true, message: "Progress reset" });
+}

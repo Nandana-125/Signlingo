@@ -9,18 +9,41 @@ import userLessonsRoutes from "./routes/userLessons.routes.js";
 import lessonsRoutes from "./routes/lessons.routes.js";
 import quizRoutes from "./routes/quiz.routes.js";
 import signsRoutes from "./routes/signs.routes.js"; // <-- add this
+import profileRoutes from "./routes/profile.routes.js";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
+const ALLOWED_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+//   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+//   res.setHeader("Access-Control-Allow-Credentials", "true");
+//   if (req.method === "OPTIONS") return res.sendStatus(200);
+//   next();
+// });
+
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+  res.setHeader("Vary", "Origin");
   res.setHeader("Access-Control-Allow-Credentials", "true");
-  if (req.method === "OPTIONS") return res.sendStatus(200);
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, X-Requested-With"
+  );
+  res.setHeader("Access-Control-Max-Age", "600"); // cache preflight 10m
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).end(); // preflight OK (no body)
+  }
   next();
 });
 
@@ -52,6 +75,8 @@ app.get("/", (req, res) => res.send("SignLingo backend running"));
 app.use("/api/lessons", lessonsRoutes);
 
 app.use("/api/user-lessons", userLessonsRoutes);
+
+app.use("/api/profile", profileRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -1,33 +1,53 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import s from "./ProfilePage.module.css";
 import avatar from "../../assets/images/avatar.png";
+import useProfileOverview from "../../hooks/useProfileOverview";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState({
-    name: "Nandana Pradeep",
-    age: 22,
-    email: "nandana@example.com",
-    xp: 2400,
-    xpGoal: 3000,
-    streak: 12,
-    level: 5,
-    quizzesDone: 37,
-  });
+  // modal states (useState #1 & #2)
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
-  const lessons = [
-    { id: "alphabet", title: "Alphabet A–Z", progress: 82 },
-    { id: "greetings", title: "Greetings & Essentials", progress: 45 },
-    { id: "numbers", title: "Numbers 1–20", progress: 60 },
-    { id: "daily", title: "Daily Phrases", progress: 20 },
-  ];
+  // custom hook (counts as another hook usage)
+  const {
+    loading,
+    err,
+    user,
+    lessons,
+    quizStats,
+    updateProfile,
+    deleteProfile,
+  } = useProfileOverview();
 
-  const quizzes = [
-    { id: "quiz-1", title: "Alphabets Check", progress: 40 },
-    { id: "quiz-2", title: "Greetings Sprint", progress: 70 },
-    { id: "quiz-3", title: "Numbers Drill", progress: 10 },
-  ];
+  const quizProgressPct = useMemo(() => {
+    // avoid divide-by-zero and clamp to 0..100
+    if (!quizStats?.levelsUnlocked) return 0;
+    const pct = (quizStats.levelsCompleted / quizStats.levelsUnlocked) * 100;
+    return Math.max(0, Math.min(100, Math.round(pct)));
+  }, [quizStats]);
+
+  if (loading) return <div style={{ padding: 24 }}>Loading…</div>;
+  if (err) return <div style={{ padding: 24 }}>{err}</div>;
+  if (!user) return null;
+
+  async function handleSaveProfile(form) {
+    try {
+      await updateProfile(form);
+      setShowEdit(false);
+    } catch (e) {
+      alert(e.message || "Update failed");
+    }
+  }
+
+  async function handleDeleteProfile() {
+    try {
+      await deleteProfile();
+      setShowDelete(false);
+      window.location.href = "/login";
+    } catch (e) {
+      alert(e.message || "Delete failed");
+    }
+  }
 
   return (
     <div className={s.page}>
@@ -43,13 +63,13 @@ export default function ProfilePage() {
             <div>
               <div className={s.nameRow}>
                 <h1 className={s.name}>{user.name}</h1>
-                {/* Edit & Delete icon buttons */}
+
                 <button
+                  type="button"
                   className={s.iconBtn}
                   onClick={() => setShowEdit(true)}
                   title="Edit profile"
                 >
-                  {/* pencil */}
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Z"
@@ -63,12 +83,13 @@ export default function ProfilePage() {
                     />
                   </svg>
                 </button>
+
                 <button
+                  type="button"
                   className={`${s.iconBtn} ${s.danger}`}
                   onClick={() => setShowDelete(true)}
                   title="Delete account"
                 >
-                  {/* trash */}
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M4 7h16M9 7V5h6v2m-8 0v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V7"
@@ -78,8 +99,9 @@ export default function ProfilePage() {
                   </svg>
                 </button>
               </div>
+
               <p className={s.subline}>
-                <span>Age {user.age}</span> ·{" "}
+                <span>Age {user.age ?? "—"}</span> ·{" "}
                 <a href={`mailto:${user.email}`}>{user.email}</a>
               </p>
               <p className={s.badge}>Bonus Booster • LV {user.level}</p>
@@ -88,12 +110,14 @@ export default function ProfilePage() {
 
           <div className={s.actions}>
             <button
+              type="button"
               className={s.ghostBtn}
               onClick={() => (window.location.href = "/app/lessons")}
             >
               Continue Learning
             </button>
             <button
+              type="button"
               className={s.primaryBtn}
               onClick={() => (window.location.href = "/app/quizzes")}
             >
@@ -103,20 +127,24 @@ export default function ProfilePage() {
         </div>
 
         <div className={s.xpRow}>
-          <Progress value={user.xp} max={user.xpGoal} />
+          <Progress value={user.xp} max={user.xpGoal ?? 3000} />
           <span className={s.xpText}>
-            {user.xp} / {user.xpGoal} XP
+            {user.xp} / {user.xpGoal ?? 3000} XP
           </span>
         </div>
 
         <div className={s.metrics}>
-          <Metric label="Streak" value={user.streak} />
-          <Metric label="Level" value={user.level} />
-          <Metric label="Quizzes Done" value={user.quizzesDone} />
+          <Metric label="Streak" value={user.streak ?? 0} />
+          <Metric label="Level" value={user.level ?? 1} />
+          <Metric label="Quiz Levels" value={quizStats.levelsCompleted} />
+        </div>
+
+        <div style={{ marginTop: 10, color: "#555", fontWeight: 700 }}>
+          Total Quiz Score: {quizStats.totalScore}
         </div>
       </section>
 
-      {/* Lessons section */}
+      {/* Lessons */}
       <section className={s.sectionCard}>
         <div className={s.sectionHead}>
           <h2>Lessons in Progress</h2>
@@ -128,47 +156,38 @@ export default function ProfilePage() {
               key={l.id}
               title={l.title}
               progress={l.progress}
-              onContinue={() =>
-                (window.location.href = `/app/lessons?unit=${l.id}`)
-              }
+              onContinue={() => (window.location.href = `/app/lesson/${l.id}`)}
             />
           ))}
+          {lessons.length === 0 && (
+            <p style={{ color: "#666" }}>No active lessons yet.</p>
+          )}
         </div>
       </section>
 
-      {/* Quizzes section */}
+      {/* Quizzes */}
       <section className={s.sectionCard}>
         <div className={s.sectionHead}>
           <h2>Quizzes</h2>
-          <span className={s.count}>{quizzes.length}</span>
+          <span className={s.count}>{quizStats.levelsUnlocked}</span>
         </div>
         <div className={s.itemGrid}>
-          {quizzes.map((qz) => (
-            <ItemCard
-              key={qz.id}
-              title={qz.title}
-              progress={qz.progress}
-              onContinue={() =>
-                (window.location.href = `/app/quizzes?quiz=${qz.id}`)
-              }
-            />
-          ))}
+          <ItemCard
+            title="Quiz Progress"
+            progress={quizProgressPct}
+            onContinue={() => (window.location.href = `/app/quizzes`)}
+          />
         </div>
       </section>
 
-      {/* Edit Modal */}
+      {/* Modals */}
       {showEdit && (
         <EditProfileModal
           initial={user}
           onClose={() => setShowEdit(false)}
-          onSave={(u) => {
-            setUser((prev) => ({ ...prev, ...u }));
-            setShowEdit(false);
-          }}
+          onSave={handleSaveProfile}
         />
       )}
-
-      {/* Delete Confirm */}
       {showDelete && (
         <ConfirmModal
           title="Delete account?"
@@ -176,11 +195,7 @@ export default function ProfilePage() {
           confirmLabel="Delete"
           tone="danger"
           onCancel={() => setShowDelete(false)}
-          onConfirm={() => {
-            setShowDelete(false);
-            // Do your API call here; for now redirect to login.
-            window.location.href = "/login";
-          }}
+          onConfirm={handleDeleteProfile}
         />
       )}
     </div>
@@ -201,7 +216,6 @@ function Progress({ value = 0, max = 100 }) {
     </div>
   );
 }
-
 function Metric({ label, value }) {
   return (
     <div className={s.metricCard}>
@@ -210,7 +224,6 @@ function Metric({ label, value }) {
     </div>
   );
 }
-
 function ItemCard({ title, progress, onContinue }) {
   return (
     <article className={s.lessonItem}>
@@ -221,7 +234,7 @@ function ItemCard({ title, progress, onContinue }) {
       <Progress value={progress} max={100} />
       <div className={s.lessonMeta}>
         <span>{progress}%</span>
-        <button className={s.smallBtn} onClick={onContinue}>
+        <button type="button" className={s.smallBtn} onClick={onContinue}>
           Continue
         </button>
       </div>
@@ -229,13 +242,14 @@ function ItemCard({ title, progress, onContinue }) {
   );
 }
 
-/* ----------------- Modals ----------------- */
+/* --- Modals (unchanged) --- */
 function EditProfileModal({ initial, onSave, onClose }) {
   const [form, setForm] = useState({
     name: initial.name || "",
     age: initial.age ?? "",
     email: initial.email || "",
   });
+  const [saving, setSaving] = useState(false);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -245,14 +259,19 @@ function EditProfileModal({ initial, onSave, onClose }) {
     }));
   }
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim()) return;
-    onSave({
-      name: form.name.trim(),
-      age: Number(form.age) || initial.age,
-      email: form.email.trim(),
-    });
+    setSaving(true);
+    try {
+      await onSave({
+        name: form.name.trim(),
+        age: form.age ? Number(form.age) : null,
+        email: form.email.trim(),
+      });
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -265,7 +284,12 @@ function EditProfileModal({ initial, onSave, onClose }) {
       >
         <div className={s.modalHead}>
           <h3>Edit Profile</h3>
-          <button className={s.modalClose} onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            className={s.modalClose}
+            onClick={onClose}
+            aria-label="Close"
+          >
             ×
           </button>
         </div>
@@ -305,8 +329,8 @@ function EditProfileModal({ initial, onSave, onClose }) {
             <button type="button" className={s.ghostBtn} onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className={s.primaryBtn}>
-              Save
+            <button type="submit" className={s.primaryBtn} disabled={saving}>
+              {saving ? "Saving..." : "Save"}
             </button>
           </div>
         </form>
@@ -334,6 +358,7 @@ function ConfirmModal({
         <div className={s.modalHead}>
           <h3>{title}</h3>
           <button
+            type="button"
             className={s.modalClose}
             onClick={onCancel}
             aria-label="Close"

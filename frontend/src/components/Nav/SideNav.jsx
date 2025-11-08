@@ -1,8 +1,24 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import s from "./SideNav.module.css";
+import { AuthAPI } from "../../api/auth.api";
 
 export default function SideNav({ onLogout }) {
   const navigate = useNavigate();
+
+  async function handleLogout() {
+    try {
+      if (onLogout) {
+        await onLogout(); // allow parent override
+      } else {
+        await AuthAPI.logout(); // default: call backend, destroy session
+      }
+    } catch (e) {
+      console.error("Logout failed:", e);
+    } finally {
+      navigate("/login", { replace: true });
+      window.location.reload(); // nuke any client state
+    }
+  }
   const items = [
     { to: "/app/lessons", label: "Lessons", icon: HomeIcon },
     { to: "/app/quizzes", label: "Quizzes", icon: AbcIcon },
@@ -44,7 +60,7 @@ export default function SideNav({ onLogout }) {
 
       <button
         className={`${s.item} ${s.logout}`}
-        onClick={onLogout}
+        onClick={handleLogout}
         type="button"
       >
         <LogoutIcon className={s.icon} />

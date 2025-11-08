@@ -1,15 +1,19 @@
 // frontend/src/api/auth.api.js
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const HOST = import.meta.env.VITE_BACKEND_HOST ?? "localhost";
+const PORT = import.meta.env.VITE_BACKEND_PORT ?? "5000";
+const PREFIX = import.meta.env.VITE_API_PREFIX ?? "/api";
+const API_URL =
+  import.meta.env.VITE_API_URL ?? `http://${HOST}:${PORT}${PREFIX}`;
 
 export const AuthAPI = {
   async signup(data) {
     const res = await fetch(`${API_URL}/auth/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include", // important: allows cookie-based sessions
+      credentials: "include",
       body: JSON.stringify(data),
     });
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(json.error || "Signup failed");
     return json;
   },
@@ -21,23 +25,23 @@ export const AuthAPI = {
       credentials: "include",
       body: JSON.stringify(data),
     });
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(json.error || "Login failed");
     return json;
   },
 
   async logout() {
-    const res = await fetch(`${API_URL}/auth/logout`, {
+    // server clears session + cookie
+    await fetch(`${API_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
     });
-    return res.json();
   },
 
   async check() {
     const res = await fetch(`${API_URL}/auth/check`, {
       credentials: "include",
     });
-    return res.json();
+    return res.json().catch(() => ({}));
   },
 };

@@ -136,7 +136,7 @@ export default function ProfilePage() {
         <div className={s.metrics}>
           <Metric label="Streak" value={user.streak ?? 0} />
           <Metric label="Level" value={user.level ?? 1} />
-          <Metric label="Quiz Levels" value={quizStats.levelsCompleted} />
+          <Metric label="Quiz Levels" value={quizStats.levelsUnlocked} />
         </div>
 
         <div style={{ marginTop: 10, color: "#555", fontWeight: 700 }}>
@@ -174,7 +174,15 @@ export default function ProfilePage() {
         <div className={s.itemGrid}>
           <ItemCard
             title="Quiz Progress"
-            progress={quizProgressPct}
+            progress={Math.max(
+              0,
+              Math.min(
+                100,
+                quizStats.levelsUnlocked
+                  ? Math.round(quizStats.levelsUnlocked)
+                  : 0
+              )
+            )}
             onContinue={() => (window.location.href = `/app/quizzes`)}
           />
         </div>

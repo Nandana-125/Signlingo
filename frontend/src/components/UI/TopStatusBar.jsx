@@ -1,6 +1,9 @@
 import React from "react";
+import { useUserStats } from "../context/UserStatsContext";
 
-export default function TopStatusBar({ xp = 250, streak = 5 }) {
+export default function TopStatusBar() {
+  const { xp, streak } = useUserStats();
+
   return (
     <div style={styles.bar}>
       <div style={styles.iconWrap}>
@@ -34,7 +37,5 @@ const styles = {
     fontSize: "0.95rem",
     color: "#1f2421",
   },
-  icon: {
-    fontSize: "1rem",
-  },
+  icon: { fontSize: "1rem" },
 };

@@ -2,11 +2,13 @@ import { useState } from "react";
 import LessonCard from "./LessonCard";
 import LessonDetailsPanel from "./LessonDetailsPanel";
 import { useLessons } from "../../hooks/useLessons";
+import { fetchAllUserProgress } from "../../api/userLessons.api";
 import styles from "./Lessons.module.css";
 
 export default function LessonGrid() {
   const [selectedLessonId, setSelectedLessonId] = useState(null);
   const { lessons, lesson, loading, error } = useLessons(selectedLessonId);
+  const [progressMap, setProgressMap] = useState({});
 
   if (loading) return <p>Loading lessons...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -25,6 +27,7 @@ export default function LessonGrid() {
               key={l._id}
               lesson={{
                 ...l,
+                started: !!progressMap[l._id],
                 color: ["#216869", "#49a078", "#9cc5a1", "#5b8a72"][i % 4],
               }}
               onClick={() => setSelectedLessonId(l._id)}

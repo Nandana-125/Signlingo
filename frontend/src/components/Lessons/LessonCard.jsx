@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./Lessons.module.css";
 
-export default function LessonCard({ lesson, onClick }) {
+export default function LessonCard({ lesson, onClick, started = false }) {
   return (
     <div
       className={styles.card}
@@ -12,9 +12,9 @@ export default function LessonCard({ lesson, onClick }) {
     >
       <h3 className={styles.cardTitle}>{lesson.title}</h3>
       <p className={styles.cardMeta}>
-      {(lesson.signCount || lesson.signs?.length || 0)} Signs · {lesson.estimatedMinutes || lesson.time}
+        {(lesson.signCount || lesson.signs?.length || 0)} Signs · {lesson.estimatedMinutes || lesson.time}
       </p>
-      <span className={styles.status}>Start</span>
+      <span className={styles.status}>{started ? "Continue" : "Start"} Lesson</span>
     </div>
   );
 }

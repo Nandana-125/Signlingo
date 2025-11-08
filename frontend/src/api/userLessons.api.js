@@ -29,6 +29,25 @@ export function startLesson(lessonId) {
   });
 }
 
+// fetch all user lesson progress summaries
+export async function fetchAllUserProgress(userId) {
+  const res = await fetch(`http://localhost:5000/api/user-lessons?userId=${userId}`);
+  return res.json();
+
+    // normalize possible ObjectId shapes from backend
+  if (data?.success && Array.isArray(data.progressList)) {
+    data.progressList = data.progressList.map((p) => ({
+      ...p,
+      lessonId: p.lessonId?.$oid || p.lessonId || "",
+      userId: p.userId?.$oid || p.userId || "",
+      completedSigns: Array.isArray(p.completedSigns) ? p.completedSigns : [],
+      xpEarned: p.xpEarned ?? 0,
+    }));
+  }
+  return data;
+}
+
+
 /** Fetch progress for one lesson */
 export function fetchUserProgress(lessonId) {
   const u = new URL(`${BASE}/progress`);

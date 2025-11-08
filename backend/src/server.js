@@ -7,6 +7,8 @@ import authRoutes from "./routes/auth.routes.js";
 import userLessonsRoutes from "./routes/userLessons.routes.js";
 
 import lessonsRoutes from "./routes/lessons.routes.js";
+import quizRoutes from "./routes/quiz.routes.js";
+import signsRoutes from "./routes/signs.routes.js"; // <-- add this
 
 dotenv.config();
 
@@ -42,6 +44,8 @@ app.use(
 
 // --- Routes ---
 app.use("/api/auth", authRoutes);
+app.use("/api/quizzes", quizRoutes);
+app.use("/api/signs", signsRoutes);
 
 app.get("/", (req, res) => res.send("SignLingo backend running"));
 

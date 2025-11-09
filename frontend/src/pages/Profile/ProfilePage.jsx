@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import s from "./ProfilePage.module.css";
 import avatar from "../../assets/images/avatar.png";
 import useProfileOverview from "../../hooks/useProfileOverview";
+import PropTypes from "prop-types";
 
 export default function ProfilePage() {
   // modal states (useState #1 & #2)
@@ -395,3 +396,38 @@ function ConfirmModal({
     </div>
   );
 }
+
+Progress.propTypes = {
+  value: PropTypes.number,
+  max: PropTypes.number,
+};
+
+Metric.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+};
+
+ItemCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  progress: PropTypes.number.isRequired,
+  onContinue: PropTypes.func.isRequired,
+};
+
+EditProfileModal.propTypes = {
+  initial: PropTypes.shape({
+    name: PropTypes.string,
+    age: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    email: PropTypes.string,
+  }).isRequired,
+  onSave: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
+
+ConfirmModal.propTypes = {
+  title: PropTypes.string.isRequired,
+  message: PropTypes.string.isRequired,
+  confirmLabel: PropTypes.string,
+  tone: PropTypes.oneOf(["default", "danger"]),
+  onCancel: PropTypes.func.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+};

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import s from "./LivePracticePage.module.css";
+import PropTypes from "prop-types";
 
 const API_BASE = "/api/live"; // proxied to FastAPI (see vite.config.js)
 
@@ -179,3 +180,5 @@ export default function LivePractice() {
     </div>
   );
 }
+
+LivePractice.propTypes = {};

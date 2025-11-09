@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./LeaderboardPage.module.css";
+import PropTypes from "prop-types";
 
 const top3 = [
   {
@@ -114,3 +115,29 @@ export default function LeaderboardPage() {
     </div>
   );
 }
+
+TopCard.propTypes = {
+  item: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    points: PropTypes.number.isRequired,
+    streak: PropTypes.number.isRequired,
+    courses: PropTypes.number.isRequired,
+    avatarBg: PropTypes.string.isRequired,
+    rankBadge: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
+  }).isRequired,
+};
+
+Row.propTypes = {
+  r: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    user: PropTypes.string.isRequired,
+    courses: PropTypes.number.isRequired,
+    streak: PropTypes.number.isRequired,
+    points: PropTypes.number.isRequired,
+    isYou: PropTypes.bool,
+  }).isRequired,
+};
+
+LeaderboardPage.propTypes = {};

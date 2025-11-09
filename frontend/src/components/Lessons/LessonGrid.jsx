@@ -42,3 +42,4 @@ export default function LessonGrid() {
     </div>
   );
 }
+LessonGrid.propTypes = {};

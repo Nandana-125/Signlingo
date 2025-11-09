@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 export default function TopStatusBar({ xp = 250, streak = 5 }) {
   return (
@@ -37,4 +38,9 @@ const styles = {
   icon: {
     fontSize: "1rem",
   },
+};
+
+TopStatusBar.propTypes = {
+  xp: PropTypes.number,
+  streak: PropTypes.number,
 };

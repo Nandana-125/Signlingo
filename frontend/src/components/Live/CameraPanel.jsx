@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import s from "./CameraPanel.module.css";
-
+import PropTypes from "prop-types";
 /**
  * Props:
  * - mode: 'letters' | 'gestures' | null
@@ -141,3 +141,8 @@ export default function CameraPanel({ mode }) {
     </div>
   );
 }
+
+CameraPanel.propTypes = {
+  // not required so null/undefined are allowed; when provided, must be one of these
+  mode: PropTypes.oneOf(["letters", "gestures"]),
+};

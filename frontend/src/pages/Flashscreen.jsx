@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Flashscreen.module.css";
+import PropTypes from "prop-types";
 
 // If your asset is PNG, just switch to .png here.
 import heroImg from "../assets/images/hero-bg-2.gif";
@@ -95,3 +96,5 @@ export default function Flashscreen() {
     </div>
   );
 }
+
+Flashscreen.propTypes = {};

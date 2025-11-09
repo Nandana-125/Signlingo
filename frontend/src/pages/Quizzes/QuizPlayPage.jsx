@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import s from "./QuizPlayPage.module.css";
 import { useQuizSession } from "../../hooks/useQuizSession";
+import PropTypes from "prop-types";
 
 const TOTAL_TIME = 40_000;
 
@@ -395,3 +396,17 @@ function StopIcon(p) {
     </svg>
   );
 }
+
+Star.propTypes = {
+  on: PropTypes.bool,
+};
+
+StarRow.propTypes = {
+  filled: PropTypes.number,
+};
+
+CircleBtn.propTypes = {
+  label: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
+};

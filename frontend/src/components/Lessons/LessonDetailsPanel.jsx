@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import styles from "./Lessons.module.css";
+import PropTypes from "prop-types";
 
 export default function LessonDetailsPanel({ lesson, onClose }) {
   const navigate = useNavigate();
@@ -10,10 +11,12 @@ export default function LessonDetailsPanel({ lesson, onClose }) {
       {/* header with back arrow & title */}
       <div
         className={styles.panelHeader}
-        style={{backgroundColor: lesson.color || "#216869",
-                background: `linear-gradient(135deg, ${
-                lesson.color || "#216869"
-                } 0%, #1f2421 100%)`,}}
+        style={{
+          backgroundColor: lesson.color || "#216869",
+          background: `linear-gradient(135deg, ${
+            lesson.color || "#216869"
+          } 0%, #1f2421 100%)`,
+        }}
       >
         <button
           className={styles.backArrow}
@@ -61,3 +64,24 @@ export default function LessonDetailsPanel({ lesson, onClose }) {
     </aside>
   );
 }
+
+const SignShape = PropTypes.shape({
+  _id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+  display: PropTypes.string,
+  media: PropTypes.shape({
+    imageUrl: PropTypes.string,
+  }),
+});
+
+LessonDetailsPanel.propTypes = {
+  lesson: PropTypes.shape({
+    _id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+    title: PropTypes.string.isRequired,
+    category: PropTypes.string,
+    color: PropTypes.string,
+    desc: PropTypes.string,
+    estimatedMinutes: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    signs: PropTypes.arrayOf(SignShape),
+  }).isRequired,
+  onClose: PropTypes.func.isRequired,
+};

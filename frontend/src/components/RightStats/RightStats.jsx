@@ -1,6 +1,7 @@
 import React from "react";
 import { useUserStats } from "../../context/UserStatsContext.jsx";
 import styles from "./RightStats.module.css";
+import PropTypes from "prop-types";
 
 function StatPill({ icon, value, label }) {
   return (
@@ -85,3 +86,9 @@ export default function RightStats() {
     </aside>
   );
 }
+
+StatPill.propTypes = {
+  icon: PropTypes.node.isRequired,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  label: PropTypes.string.isRequired,
+};

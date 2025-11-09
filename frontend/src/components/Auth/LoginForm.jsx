@@ -22,6 +22,9 @@ function EyeIcon({ on, ...props }) {
   );
 }
 EyeIcon.propTypes = { on: PropTypes.bool };
+EyeIcon.defaultProps = {
+  on: false,
+};
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -43,7 +46,7 @@ export default function LoginForm() {
       // setMsg("✔ Logged in (demo). Wire to backend later.");
       const res = await AuthAPI.login({ email, password: pw });
       setMsg("✔ " + res.message);
-      setTimeout(() => navigate("/app/lessons"), 800); 
+      setTimeout(() => navigate("/app/lessons"), 800);
     } catch (err) {
       setMsg(err.message || "Login failed");
     } finally {
@@ -130,3 +133,4 @@ export default function LoginForm() {
     </form>
   );
 }
+LoginForm.propTypes = {};

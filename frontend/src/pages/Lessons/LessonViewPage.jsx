@@ -8,6 +8,7 @@ import {
   resetLesson,
 } from "../../api/userLessons.api";
 import styles from "../../components/Lessons/Lessons.module.css";
+import PropTypes from "prop-types";
 
 export default function LessonViewPage() {
   const { lessonId } = useParams();
@@ -198,3 +199,5 @@ export default function LessonViewPage() {
     </div>
   );
 }
+
+LessonViewPage.propTypes = {};

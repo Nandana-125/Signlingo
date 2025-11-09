@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchSigns } from "../../api/signs.api"; // <-- new helper
 import styles from "./CharactersPage.module.css";
+import PropTypes from "prop-types";
 
 const PLACEHOLDER = "/images/signs/placeholder.png";
 
@@ -153,3 +154,4 @@ export default function CharactersPage() {
     </div>
   );
 }
+CharactersPage.propTypes = {};

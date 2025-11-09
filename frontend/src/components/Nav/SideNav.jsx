@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import s from "./SideNav.module.css";
 import { AuthAPI } from "../../api/auth.api";
+import PropTypes from "prop-types";
 
 export default function SideNav({ onLogout }) {
   const navigate = useNavigate();
@@ -138,3 +139,21 @@ function LogoutIcon(p) {
     </svg>
   );
 }
+
+SideNav.propTypes = {
+  onLogout: PropTypes.func, // optional override from parent
+};
+const IconPropTypes = {
+  className: PropTypes.string,
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+HomeIcon.propTypes =
+  AbcIcon.propTypes =
+  ShieldIcon.propTypes =
+  LiveIcon.propTypes =
+  PeopleIcon.propTypes =
+  ProfileIcon.propTypes =
+  LogoutIcon.propTypes =
+    IconPropTypes;

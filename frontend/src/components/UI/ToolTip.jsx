@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./Tooltip.module.css";
+import PropTypes from "prop-types";
 
 export default function Tooltip({ icon, text }) {
   return (
@@ -9,3 +10,7 @@ export default function Tooltip({ icon, text }) {
     </div>
   );
 }
+Tooltip.propTypes = {
+  icon: PropTypes.node.isRequired,
+  text: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+};

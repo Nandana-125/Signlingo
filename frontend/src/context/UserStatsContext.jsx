@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
 const Ctx = createContext();
 
@@ -47,3 +48,8 @@ export function StatsProvider({ children }) {
 }
 
 export const useUserStats = () => useContext(Ctx);
+
+StatsProvider.propTypes = {
+  /** React children rendered inside the provider */
+  children: PropTypes.node.isRequired,
+};

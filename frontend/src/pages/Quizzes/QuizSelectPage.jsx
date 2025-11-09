@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import s from "./QuizSelectPage.module.css";
 import { QuizAPI } from "../../api/quiz.api";
+import PropTypes from "prop-types";
 
 function Star({ filled }) {
   return (
@@ -152,3 +153,15 @@ export default function QuizSelectPage() {
     </div>
   );
 }
+
+Star.propTypes = {
+  filled: PropTypes.bool.isRequired,
+};
+
+LockIcon.propTypes = {
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  className: PropTypes.string,
+  onClick: PropTypes.func,
+  title: PropTypes.string,
+};

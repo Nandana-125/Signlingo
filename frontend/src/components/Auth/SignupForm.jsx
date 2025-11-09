@@ -130,3 +130,6 @@ export default function SignupForm({ onSwitchToLogin }) {
 SignupForm.propTypes = {
   onSwitchToLogin: PropTypes.func.isRequired,
 };
+SignupForm.defaultProps = {
+  onSwitchToLogin: () => {},
+};

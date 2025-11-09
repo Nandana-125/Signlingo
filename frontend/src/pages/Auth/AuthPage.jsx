@@ -3,21 +3,13 @@ import styles from "./AuthPage.module.css";
 import LoginForm from "../../components/Auth/LoginForm.jsx";
 import SignupForm from "../../components/Auth/SignupForm.jsx";
 import loginImg from "../../assets/images/img3.webp";
+import PropTypes from "prop-types";
 
 export default function AuthPage() {
   const [mode, setMode] = useState("login");
 
   return (
     <main className={styles.wrap}>
-      {/* fixed top-right pill like the mock (UI only) */}
-      <button
-        className={styles.topAction}
-        onClick={() => setMode("login")}
-        aria-label="Sign in"
-      >
-        Sign in
-      </button>
-
       {/* Full-height split layout */}
       <div className={styles.card}>
         {/* LEFT: image with overlay copy + dots */}
@@ -77,3 +69,5 @@ export default function AuthPage() {
     </main>
   );
 }
+
+AuthPage.propTypes = {};

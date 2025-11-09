@@ -4,6 +4,7 @@ import { StatsProvider } from "../context/UserStatsContext.jsx";
 import RightStats from "../components/RightStats/RightStats.jsx";
 import SideNav from "../components/Nav/SideNav.jsx";
 import styles from "./AppShell.module.css";
+import PropTypes from "prop-types";
 
 export default function AppShell() {
   const { pathname } = useLocation();
@@ -27,3 +28,4 @@ export default function AppShell() {
     </StatsProvider>
   );
 }
+AppShell.propTypes = {};

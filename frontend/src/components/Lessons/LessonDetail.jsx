@@ -1,5 +1,6 @@
 import styles from "./LessonDetail.module.css";
 import { useLessons } from "../../hooks/useLessons";
+import PropTypes from "prop-types";
 
 export default function LessonDetail({ lessonId }) {
   const { lesson, loading, error } = useLessons(lessonId);
@@ -24,3 +25,7 @@ export default function LessonDetail({ lessonId }) {
     </div>
   );
 }
+LessonDetail.propTypes = {
+  // lessonId is typically a string route param (Mongo ObjectId as string)
+  lessonId: PropTypes.string.isRequired,
+};

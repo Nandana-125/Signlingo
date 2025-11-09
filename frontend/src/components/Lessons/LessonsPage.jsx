@@ -1,5 +1,6 @@
 import React from "react";
 import LessonGrid from "../components/Lessons/LessonGrid.jsx";
+import PropTypes from "prop-types";
 
 export default function LessonsPage() {
   return (
@@ -9,3 +10,5 @@ export default function LessonsPage() {
     </div>
   );
 }
+
+LessonsPage.propTypes = {};

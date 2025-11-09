@@ -35,9 +35,9 @@ export default function Flashscreen() {
           <p className={styles.kicker}>Welcome to SignLingo</p>
 
           <h1 className={styles.title}>
-            THE DIFFERENCE, LOVE
+            MASTER THE GESTURES
             <br />
-            <span className={styles.highlight}>THE EXPERIENCE!</span>
+            <span className={styles.highlight}> OWN THE CONVERSATION!</span>
           </h1>
 
           <p className={styles.subtitle}>

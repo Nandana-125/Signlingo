@@ -1,23 +1,19 @@
+// server/src/routes/live.js
 import { Router } from "express";
 import multer from "multer";
 
-const upload = multer(); // keeps file in memory
+const upload = multer();
 const router = Router();
 
-const FASTAPI_URL = process.env.FASTAPI_URL || "http://localhost:8001";
+const RAW_FASTAPI_URL = process.env.FASTAPI_URL || "http://localhost:8001";
+const FASTAPI_BASE = RAW_FASTAPI_URL.replace(/\/+$/, ""); // trim trailing slashes
 
-/**
- * Accepts multipart/form-data with field "image"
- * Forwards to FastAPI /detect?mode=letters|gestures
- */
 router.post("/detect", upload.single("image"), async (req, res) => {
   try {
     const mode = (req.query.mode || "letters").toString();
-    if (!req.file || !req.file.buffer) {
+    if (!req.file?.buffer) {
       return res.status(400).json({ error: "Image is required" });
     }
-
-    // Node 18+ has global fetch, FormData, Blob
     const fd = new FormData();
     const contentType = req.file.mimetype || "image/jpeg";
     fd.append(
@@ -27,7 +23,7 @@ router.post("/detect", upload.single("image"), async (req, res) => {
     );
 
     const resp = await fetch(
-      `${FASTAPI_URL}/detect?mode=${encodeURIComponent(mode)}`,
+      `${FASTAPI_BASE}/detect?mode=${encodeURIComponent(mode)}`,
       {
         method: "POST",
         body: fd,

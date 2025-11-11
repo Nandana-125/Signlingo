@@ -7,3 +7,4 @@ scikit-learn==1.2.0
 sse-starlette==1.6.5
 tensorflow-macos==2.15.0
 tensorflow-metal==1.1.0
+tensorflow==2.15.0

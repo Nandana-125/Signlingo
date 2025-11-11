@@ -50,7 +50,6 @@ ml-service/models/**
 !ml-service/models/README.md
 
 # If you still have an old “data models” folder somewhere:
-data models/**
 !data models/README.md
 
 

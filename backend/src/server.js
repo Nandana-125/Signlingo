@@ -14,10 +14,14 @@ import leaderboardRouter from "./routes/leaderboard.routes.js";
 dotenv.config();
 
 const app = express();
+
+// ✅ Required so Render (behind a proxy/HTTPS) allows secure cookies
+app.set("trust proxy", 1);
+
 app.use(express.json());
 
 const ALLOWED_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
-
+const IS_PROD = process.env.NODE_ENV === "production";
 // app.use((req, res, next) => {
 //   res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
 //   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
@@ -58,9 +62,10 @@ app.use(
       ttl: 24 * 60 * 60, // 1 day
     }),
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
-      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: IS_PROD ? "none" : "lax",
+      secure: IS_PROD,
     },
   })
 );
